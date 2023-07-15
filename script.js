@@ -92,3 +92,106 @@ async function copyContent(){
     
 }
 
+function sufflePassword(array){
+    for ( let i = array.length-1; i > 0; i--){
+        const j = Math.floor(Math.random() * ( i + 1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] =  temp;
+    }
+
+    let str = "";
+    array.forEach((el) => (str += el));
+    return str;
+}
+
+function handlecheckBoxChage() { 
+    checkCount = 0;
+    allCheckBox.forEach( (checkbox) => {
+        if(checkbox.checked) 
+            checkCount++; 
+    });
+
+    // special condition
+    if(passwordLength < checkCount){
+        passwordLength = checkCount;
+        handleSlider();
+    }
+}
+
+allCheckBox.forEach( (checkbox) => {
+    checkbox.addEventListener('change', handlecheckBoxChage);
+})
+
+inputSlider.addEventListener('input', (e) => {
+    passwordLength = e.target.value;
+    handleSlider();
+})
+
+copyBtn.addEventListener('click', () => {
+    if(passwordDisplay.value)
+        copyContent(); 
+})
+
+generateBtn.addEventListener('click', () => {
+    if(checkCount <=0)  return;
+
+    if(passwordLength < checkCount){
+        passwordLength = checkCount;
+        handleSlider();
+    }
+
+    password = "";
+
+    // // if(uppercaseCheck.checked){
+    // //     password += generateUpperCase();
+    // // }
+
+    // // if(lowercaseCheck.checked){
+    // //     password += generateLowerCase();
+    // // }
+    
+    // // if(numbersCheck.checked){
+    // //     password += generateRandomNumber();
+    // // }
+    
+    // // if(symbolsCheck.checked){
+    // //     password += generateSymbol();
+    // // }
+
+
+    let funcArr = [];
+
+    if(uppercaseCheck.checked)
+        funcArr.push(generateUpperCase);
+
+    if(lowercaseCheck.checked)
+        funcArr.push(generateLowerCase);
+
+    if(symbolsCheck.checked)
+        funcArr.push(generateSymbol);
+
+    if(numbersCheck.checked)
+        funcArr.push(generateRandomNumber);
+
+
+    // compulsary Addition
+    for(let i=0; i<funcArr.length; i++){
+        password += funcArr[i]();
+    }
+
+    // Reamaining Addition
+
+    for(let i=0; i<passwordLength-funcArr.length; i++){
+        let randIndex = getRndInteger(0, funcArr.length);
+        password += funcArr[randIndex]();
+    }   
+
+    // Suffle the password
+    password = sufflePassword(Array.from(password));
+
+    passwordDisplay.value = password;    
+
+    calcStrength();
+
+});
